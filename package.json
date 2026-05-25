@@ -1,0 +1,19 @@
+{
+  "name": "smartbookpublishing",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=apps/web\" \"npm run start:dev --workspace=apps/api\"",
+    "build": "npm run build --workspace=packages/shared && npm run build --workspace=apps/web && npm run build --workspace=apps/api",
+    "lint": "npm run lint --workspace=apps/web && npm run lint --workspace=apps/api",
+    "db:migrate": "npm run prisma:migrate --workspace=apps/api",
+    "db:studio": "npm run prisma:studio --workspace=apps/api"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

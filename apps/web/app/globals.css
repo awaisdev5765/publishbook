@@ -1,0 +1,210 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── CSS Custom Properties (DESIGN.md Apple tokens) ───────────────────────── */
+:root {
+  /* Brand */
+  --primary:           #0066cc;
+  --primary-focus:     #0071e3;
+  --primary-on-dark:   #2997ff;
+
+  /* Surfaces */
+  --canvas:            #ffffff;
+  --canvas-parchment:  #f5f5f7;
+  --surface-pearl:     #fafafc;
+  --surface-tile-1:    #272729;
+  --surface-black:     #000000;
+
+  /* Text */
+  --ink:               #1d1d1f;
+  --ink-80:            #333333;
+  --ink-48:            #7a7a7a;
+  --body-muted:        #cccccc;
+
+  /* Borders */
+  --divider-soft:      #f0f0f0;
+  --hairline:          #e0e0e0;
+
+  /* The ONE product shadow Apple uses */
+  --shadow-product: rgba(0, 0, 0, 0.22) 3px 5px 30px 0;
+}
+
+/* ─── Base ─────────────────────────────────────────────────────────────────── */
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+    font-size: 17px; /* Apple body base */
+  }
+
+  body {
+    background-color: var(--canvas);
+    color: var(--ink);
+    font-family: 'SF Pro Text', system-ui, -apple-system, BlinkMacSystemFont,
+      'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.47;
+    letter-spacing: -0.374px;
+  }
+
+  ::selection {
+    background-color: rgba(0, 102, 204, 0.15);
+  }
+
+  * { box-sizing: border-box; }
+}
+
+/* ─── Components ───────────────────────────────────────────────────────────── */
+@layer components {
+
+  /* ── Buttons ── */
+
+  /* Primary pill — the signature Apple action */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2
+           bg-primary text-white text-body font-normal
+           rounded-pill px-[22px] py-[11px]
+           transition-transform duration-100 select-none;
+  }
+  .btn-primary:hover  { background-color: var(--primary-focus); }
+  .btn-primary:active { transform: scale(0.95); }
+
+  /* Ghost pill — second CTA alongside btn-primary */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2
+           text-primary text-body font-normal
+           rounded-pill px-[22px] py-[11px]
+           border border-primary bg-transparent
+           transition-transform duration-100 select-none;
+  }
+  .btn-secondary:active { transform: scale(0.95); }
+
+  /* Store hero — larger, weight 300 */
+  .btn-store-hero {
+    @apply inline-flex items-center justify-center
+           bg-primary text-white text-btn-large font-light
+           rounded-pill px-[28px] py-[14px]
+           transition-transform duration-100 select-none;
+  }
+  .btn-store-hero:hover  { background-color: var(--primary-focus); }
+  .btn-store-hero:active { transform: scale(0.95); }
+
+  /* Dark utility (nav Sign In / Bag) */
+  .btn-dark-utility {
+    @apply inline-flex items-center justify-center
+           bg-ink text-white text-btn-utility font-normal
+           rounded-sm px-[15px] py-[8px]
+           transition-transform duration-100 select-none;
+  }
+  .btn-dark-utility:active { transform: scale(0.95); }
+
+  /* ── Layout containers ── */
+
+  .container-apple {
+    @apply mx-auto w-full px-5 sm:px-8;
+    max-width: 980px;
+  }
+
+  .container-store {
+    @apply mx-auto w-full px-5 sm:px-8;
+    max-width: 1440px;
+  }
+
+  .container-narrow {
+    @apply mx-auto w-full px-5 sm:px-8;
+    max-width: 720px;
+  }
+
+  /* ── Full-bleed product tiles ── */
+
+  .tile-light {
+    @apply w-full bg-canvas text-ink py-section;
+  }
+
+  .tile-parchment {
+    @apply w-full text-ink py-section;
+    background-color: var(--canvas-parchment);
+  }
+
+  .tile-dark {
+    @apply w-full text-white py-section;
+    background-color: var(--surface-tile-1);
+  }
+
+  /* ── Cards ── */
+
+  .card-utility {
+    @apply bg-canvas rounded-lg p-lg;
+    border: 1px solid var(--hairline);
+  }
+
+  /* ── Global nav (black bar, 44px) ── */
+  .global-nav {
+    @apply fixed top-0 inset-x-0 z-50 flex items-center
+           h-[44px] px-5 sm:px-8;
+    background-color: var(--surface-black);
+    color: #ffffff;
+  }
+
+  /* ── Sub-nav frosted glass ── */
+  .sub-nav {
+    @apply sticky top-[44px] z-40 flex items-center
+           h-[52px] px-5 sm:px-8;
+    background-color: rgba(245, 245, 247, 0.80);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  /* ── Form inputs ── */
+  .input-field {
+    @apply w-full bg-canvas text-ink outline-none transition-all duration-150;
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 17px;
+    letter-spacing: -0.374px;
+    line-height: 1.47;
+  }
+  .input-field::placeholder { color: var(--ink-48); }
+  .input-field:focus {
+    border-color: var(--primary-focus);
+    box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12);
+  }
+  .input-field:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* ── Text links ── */
+  .link { color: var(--primary); }
+  .link:hover { text-decoration: underline; }
+
+  .link-on-dark { color: var(--primary-on-dark); }
+  .link-on-dark:hover { text-decoration: underline; }
+}
+
+/* ─── Animation delays (stagger utility) ──────────────────────────────────── */
+@layer utilities {
+  .delay-100 { animation-delay: 100ms; }
+  .delay-150 { animation-delay: 150ms; }
+  .delay-200 { animation-delay: 200ms; }
+  .delay-300 { animation-delay: 300ms; }
+  .delay-400 { animation-delay: 400ms; }
+  .delay-500 { animation-delay: 500ms; }
+}
+
+/* ─── Scroll-triggered AnimateIn (data-animate attribute) ──────────────────── */
+[data-animate='hidden'] {
+  opacity: 0;
+  transform: translateY(22px);
+}
+[data-animate='visible'] {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}

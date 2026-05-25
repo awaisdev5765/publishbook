@@ -1,0 +1,184 @@
+// Smart Book Publishing — Prisma Schema
+// Phase 3: full model definitions with relations and indexes
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ──────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  ADMIN
+  AUTHOR
+  CLIENT
+}
+
+enum BookStatus {
+  DRAFT
+  IN_REVIEW
+  PUBLISHED
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+enum ServiceType {
+  EDITING
+  COVER_DESIGN
+  DISTRIBUTION
+  MARKETING
+  AUDIOBOOK
+  FULL_PACKAGE
+}
+
+// ─── Models ─────────────────────────────────────────────────────────────────
+
+model User {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         UserRole  @default(CLIENT)
+  avatarUrl    String?
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Relations
+  books        Book[]
+  orders       Order[]
+  reviews      Review[]
+  blogPosts    BlogPost[]
+
+  @@index([role])
+  @@map("users")
+}
+
+model Book {
+  id            String     @id @default(cuid())
+  title         String
+  genre         String
+  status        BookStatus @default(DRAFT)
+  coverUrl      String?
+  synopsis      String?    @db.Text
+  manuscriptUrl String?
+
+  authorId      String
+  author        User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  // Relations
+  reviews       Review[]
+  orders        Order[]
+
+  @@index([authorId])
+  @@index([status])
+  @@index([genre])
+  @@map("books")
+}
+
+model Order {
+  id                    String      @id @default(cuid())
+  serviceType           ServiceType
+  amount                Int         // stored in cents
+  status                OrderStatus @default(PENDING)
+  stripeSessionId       String?     @unique
+  stripePaymentIntentId String?     @unique
+  notes                 String?     @db.Text
+
+  userId                String
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  bookId                String?
+  book                  Book?       @relation(fields: [bookId], references: [id], onDelete: SetNull)
+
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([serviceType])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  rating      Int      // 1–5
+  content     String   @db.Text
+  isPublished Boolean  @default(false)
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  bookId      String
+  book        Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, bookId])   // one review per user per book
+  @@index([bookId])
+  @@index([isPublished])
+  @@map("reviews")
+}
+
+model BlogPost {
+  id            String    @id @default(cuid())
+  title         String
+  slug          String    @unique
+  content       String    @db.Text
+  excerpt       String?
+  coverImageUrl String?
+  isPublished   Boolean   @default(false)
+  publishedAt   DateTime?
+  tags          String[]  // postgres text[]
+
+  authorId      String
+  author        User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([authorId])
+  @@index([isPublished, publishedAt])
+  @@index([slug])
+  @@map("blog_posts")
+}
+
+model Contact {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String?
+  message   String   @db.Text
+  isRead    Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([isRead])
+  @@index([createdAt])
+  @@map("contacts")
+}
+
+model SiteContent {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  title     String?
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+  @@map("site_contents")
+}
